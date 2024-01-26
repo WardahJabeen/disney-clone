@@ -6,7 +6,7 @@ import Movies from './Movies'
 import db from '../firebase'
 import { useDispatch } from "react-redux"
 import { setMovies } from '../features/movie/movieSlice'
-import { doc, onSnapshot, setLogLevel, collection, query, where } from "firebase/firestore";
+import { doc, onSnapshot, collection, query } from "firebase/firestore";
 
 
 
