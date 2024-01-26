@@ -1,37 +1,103 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { auth, provider } from '../firebase'
+import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"
 import styled from 'styled-components'
+// import { useHistory } from "react-router-dom"
+import { useNavigate, Link } from 'react-router-dom';
+import { selectUserName, selectUserPhoto, setUserLogin, setSignOut } from '../features/user/userSlice'
+import { useDispatch, useSelector } from "react-redux"
+
+
 
 const Header = () => {
+    const dispatch = useDispatch();
+    // const history = useHistory();
+    const navigate = useNavigate();
+    const userName = useSelector(selectUserName);
+    let isApiKeyWorking = false;
+    const userPhoto = useSelector(selectUserPhoto);
+
+    //to avoid losing the user info on refresing page
+    useEffect(() => {
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                dispatch(setUserLogin({
+                    name: user.displayName,
+                    email: user.email,
+                    photo: user.photoURL
+
+                }));
+                navigate('/');
+            }
+        })
+    }, [])
+
+    const signIn = () => {
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                let user = result.user
+                dispatch(setUserLogin({
+                    name: user.displayName,
+                    email: user.email,
+                    photo: user.photoURL
+
+                }));
+                navigate('/');
+            })
+    }
+
+    const signOutUser = () => {
+        signOut(auth).then(() => {
+            dispatch(setSignOut())
+            // history.push("/login")
+            navigate('/login');
+        })
+    }
+
+
     return (
         <Nav>
             <Logo src="/images/logo.svg" />
-            <NavMenu>
-                <a>
-                    <img src="/images/home-icon.svg" />
-                    <span>HOME</span>
-                </a>
-                <a>
-                    <img src="/images/search-icon.svg" />
-                    <span>SEARCH</span>
-                </a>
-                <a>
-                    <img src="/images/watchlist-icon.svg" />
-                    <span>WATCHLIST</span>
-                </a>
-                <a>
-                    <img src="/images/original-icon.svg" />
-                    <span>ORIGINALS</span>
-                </a>
-                <a>
-                    <img src="/images/movie-icon.svg" />
-                    <span>MOVIES</span>
-                </a>
-                <a>
-                    <img src="/images/series-icon.svg" />
-                    <span>SERIES</span>
-                </a>
-            </NavMenu>
-            <UserImg src="/images/login.jpg" />
+            {!userName && isApiKeyWorking ?
+                <LoginContainer>
+                    <Login onClick={signIn}>Login</Login>
+                </LoginContainer>
+                :
+                <>
+                    <NavMenu>
+
+
+                        <Link to={`/`}>
+                            <img src="/images/home-icon.svg" />
+                            <span>HOME</span>
+
+                        </Link>
+
+                        <a>
+                            <img src="/images/search-icon.svg" />
+                            <span>SEARCH</span>
+                        </a>
+                        <a>
+                            <img src="/images/watchlist-icon.svg" />
+                            <span>WATCHLIST</span>
+                        </a>
+                        <a>
+                            <img src="/images/original-icon.svg" />
+                            <span>ORIGINALS</span>
+                        </a>
+                        <a>
+                            <img src="/images/movie-icon.svg" />
+                            <span>MOVIES</span>
+                        </a>
+                        <a>
+                            <img src="/images/series-icon.svg" />
+                            <span>SERIES</span>
+                        </a>
+                    </NavMenu>
+                    <UserImg onClick={signOutUser} src="/images/login.jpg" /></>
+
+            }
+
         </Nav>
     )
 }
@@ -56,7 +122,7 @@ const NavMenu = styled.div`
     margin-left: 25px;
     align-items: center;
 
-    a {
+    a, Link {
         display: flex;
         align-items: center;
         padding: 0 12px;
@@ -100,4 +166,28 @@ const UserImg = styled.img`
     height: 48px;
     border-radius: 50%;
     cursor: pointer;
+`
+
+const Login = styled.div`
+    border: 1px solid #f9f9f9;
+    padding: 8px 16px;
+    border-radius: 4px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background-color: rgba(0, 0, 0, 0.6);
+    transition: all 0.2ms ease 0s;
+    cursor:pointer;
+
+    &:hover {
+        background-color: #f9f9f9;
+        color: #000;
+        border-color: transparent;
+    }
+`
+
+// shifts login to all the way to the right side
+const LoginContainer = styled.div`
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
 `
