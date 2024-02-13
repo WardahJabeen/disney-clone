@@ -1,41 +1,37 @@
-import React, { useEffect, useState } from 'react'
+
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-// import { useParams } from "react-router-dom"
-// import db from "../firebase"
-// import { collection, query } from "firebase/firestore";
+import { getMovies } from "../data/dataHandler";
+import { useParams } from 'react-router-dom';
+
+
 
 
 const Detail = () => {
 
-    //grabs id from url
-    // const { id } = useParams();
-    // const { movie, setMovie } = useState()
+
+    const { id } = useParams();
+    const didUseEffect = useRef(true);
+    const [movie, setMovie] = useState({});
 
 
-    // useEffect(() => {
-    //     const q = query(collection(db, "movies"))
-    //     //grab the movie info from the DB
-    //     q.doc(id).get().then((doc) => {
-    //         if (doc.exists) {
-    //             //save the movie data
-    //             setMovie(doc.data())
-    //         } else {
-    //             //redirect to home page
+    useEffect(() => {
+        if (didUseEffect.current) {
+            didUseEffect.current = false;
+            setMovie(getMovies(id));
+        };
+    }, [id]);
 
-    //         }
-    //     })
-    // }, [])
+
 
 
     return (
         <Container>
             <Background>
-                {/* to use firebase db, change it to <img src={movie.backgroundImg}/> or setup local json file*/}
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg" />
+                <img src={movie.backgroundImg} alt="" />
             </Background>
             <ImageTitle>
-                {/* to use firebase db, change it to <img src={movie.titleImg}/> or setup local json file*/}
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78" />
+                <img src={movie.titleImg} alt="" />
             </ImageTitle>
             <Controls>
                 <PlayButton>
@@ -54,18 +50,15 @@ const Detail = () => {
                 </GroupWatchButton>
             </Controls>
             <SubTitle>
-                {/* to use firebase db, use {movie.subTitle} or setup local json file*/}
-                2018 • 7m • Family, Fantasy, Kids, Animation
+                {movie.subTitle}
             </SubTitle>
             <Description>
-                {/* to use firebase db, use {movie.description} or setup local json file */}
-                A Chinese mom who's sad when her grown son leaves home gets another
-                chance at motherhood when one of her dumplings springs to life. But she finds
-                that nothing stays cute and small forever.
+                {movie.description}
             </Description>
         </Container>
     )
 }
+
 
 export default Detail
 
