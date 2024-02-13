@@ -4,6 +4,7 @@ import ImgSlider from './ImgSlider'
 import Viewers from './Viewers'
 import Movies from './Movies'
 
+
 const Home = () => {
     return (
         <Container>
@@ -13,6 +14,7 @@ const Home = () => {
         </Container>
     )
 }
+
 
 export default Home
 
